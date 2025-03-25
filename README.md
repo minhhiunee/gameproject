@@ -10,5 +10,5 @@
                                           Bắn (phần sau).
                                    Key ⬆️ and ⬇️: di chuyển lên xuống (phần sau).
    - 15/03/2025: Tách struct và hàm của nhân vật, vật cản, kẻ địch và đạn thành các module riêng .h và .cpp. (có sử dụng AI trợ giúp)
-   -20/03/2025: Sử dụng kĩ thuật Scrolling Background - nguồn https://lazyfoo.net/tutorials/SDL/31_scrolling_backgrounds/index.php. (có thể sẽ thay thế bằng cách khác để bớt tạo sự nhàm chán).
+   - 20/03/2025: Sử dụng kĩ thuật Scrolling Background - nguồn https://lazyfoo.net/tutorials/SDL/31_scrolling_backgrounds/index.php. (có thể sẽ thay thế bằng cách khác để bớt tạo sự nhàm chán).
    - ...
