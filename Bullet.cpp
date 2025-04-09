@@ -1,15 +1,26 @@
-#include "Bullet.h"
+#ifndef BULLET_H
+#define BULLET_H
+#include <SDL.h>
 
-Bullet::Bullet() : x(0), y(0), active(false) {}
+class Bullet {
+private:
+    int x, y;
+    bool active;
+    SDL_Texture* texture;
 
-void Bullet::update() {
-    if (active) {
-        x += 10;
-    }
-}
+public:
+    Bullet(SDL_Renderer* renderer);
+    Bullet(const Bullet& other); // Copy constructor
+    Bullet& operator=(const Bullet& other); // Assignment operator
+    ~Bullet();
+    void update();
+    void shoot(int startX, int startY);
+    bool isActive() const { return active; }
+    int getX() const { return x; }
+    int getY() const { return y; }
+    void deactivate() { active = false; }
+    SDL_Texture* getTexture() const { return texture; }
+    SDL_Rect getRect() const;
+};
 
-void Bullet::shoot(int startX, int startY) {
-    x = startX;
-    y = startY;
-    active = true;
-}
+#endif
