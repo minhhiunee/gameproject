@@ -1,24 +1,58 @@
 #include "Player.h"
 #include <SDL.h>
+#include <SDL_image.h>
+#include <string>
+#include "main.h"
+using namespace std;
 
-const int PLAYER_SIZE = 50;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_HEIGHT = 720;
 
-Player::Player(int startX, int startY) {
+Player::Player(int startX, int startY, SDL_Renderer* renderer) {
     x = startX;
     y = startY;
-    speed = 5;
+    initialY = startY;
+    width = 80;          // Kích thước cho RUNNING
+    height = 150;
+    flyingWidth = 150;   // Kích thước cho FLYING
+    flyingHeight = 150;
+    speed = 7;
     score = 0;
     isJumping = false;
     jumpHeight = 0;
+    currentFrame = 0;
+    frameDelay = 5;
+    frameCounter = 0;
+
+    // Tải 8 texture cho hoạt ảnh chạy
+    for (int i = 1; i <= 8; i++) {
+        string path = "playerun_" + to_string(i) + ".png";
+        SDL_Texture* texture = IMG_LoadTexture(renderer, path.c_str());
+        if (!texture) {
+            SDL_Log("Không thể tải texture player_run%d.png: %s", i, IMG_GetError());
+        }
+        runTextures.push_back(texture);
+    }
+
+    // Tải texture cho chế độ FLYING
+    textureFlying = IMG_LoadTexture(renderer, "playerfly_1.png");
+    if (!textureFlying) {
+        SDL_Log("Không thể tải textureFlying cho Player: %s", IMG_GetError());
+    }
+}
+
+Player::~Player() {
+    for (SDL_Texture* texture : runTextures) {
+        if (texture) SDL_DestroyTexture(texture);
+    }
+    if (textureFlying) SDL_DestroyTexture(textureFlying);
 }
 
 void Player::updateJump() {
     if (isJumping) {
         y -= jumpHeight;
-        jumpHeight -= 1;
-        if (y >= WINDOW_HEIGHT - PLAYER_SIZE - 50) {
-            y = WINDOW_HEIGHT - PLAYER_SIZE - 50;
+        jumpHeight -= 0.5;
+        if (y >= initialY) {
+            y = initialY;
             isJumping = false;
         }
     }
@@ -28,9 +62,27 @@ void Player::movePlane(const Uint8* keystates) {
     if (keystates[SDL_SCANCODE_UP]) y -= speed;
     if (keystates[SDL_SCANCODE_DOWN]) y += speed;
     if (y < 0) y = 0;
-    if (y > WINDOW_HEIGHT - PLAYER_SIZE) y = WINDOW_HEIGHT - PLAYER_SIZE;
+    if (y > WINDOW_HEIGHT - flyingHeight) y = WINDOW_HEIGHT - flyingHeight;  // Dùng flyingHeight
 }
 
-SDL_Rect Player::getRect() {
-    return {x, y, PLAYER_SIZE, PLAYER_SIZE};
+void Player::updateAnimation() {
+    frameCounter++;
+    if (frameCounter >= frameDelay) {
+        frameCounter = 0;
+        currentFrame = (currentFrame + 1) % 8;
+    }
+}
+
+SDL_Rect Player::getRect(GameState state) {
+    if (state == RUNNING) {
+        return {x, y, width, height};          // Kích thước cho RUNNING
+    }
+    return {x, y, flyingWidth, flyingHeight};  // Kích thước cho FLYING
+}
+
+SDL_Texture* Player::getCurrentTexture(GameState state) {
+    if (state == RUNNING) {
+        return runTextures[currentFrame];
+    }
+    return textureFlying;
 }
