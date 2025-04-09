@@ -1,0 +1,56 @@
+# depslib dependency file v1.0
+1744124977 source:d:\c++\codeblocks\sdl game project\enemy.cpp
+	"Enemy.h"
+	<SDL.h>
+	<SDL_image.h>
+	<cstdlib>
+
+1744124967 d:\c++\codeblocks\sdl game project\enemy.h
+	<SDL.h>
+	<vector>
+
+1744124148 source:d:\c++\codeblocks\sdl game project\player.cpp
+	"Player.h"
+	<SDL.h>
+	<SDL_image.h>
+	<string>
+	"main.h"
+
+1744124032 d:\c++\codeblocks\sdl game project\player.h
+	<SDL.h>
+	<vector>
+	"main.h"
+
+1744126770 source:d:\c++\codeblocks\sdl game project\bullet.cpp
+	"Bullet.h"
+	<SDL.h>
+	<SDL_image.h>
+
+1744126776 d:\c++\codeblocks\sdl game project\bullet.h
+	<SDL.h>
+
+1743429271 source:d:\c++\codeblocks\sdl game project\object.cpp
+	"Object.h"
+	<SDL.h>
+	<SDL_image.h>
+	<cstdlib>
+
+1743429252 d:\c++\codeblocks\sdl game project\object.h
+	<SDL.h>
+	<vector>
+
+1744126763 source:d:\c++\codeblocks\sdl game project\main.cpp
+	<SDL.h>
+	<iostream>
+	<SDL_image.h>
+	<stdio.h>
+	<string>
+	<vector>
+	"Player.h"
+	"Enemy.h"
+	"Bullet.h"
+	"Object.h"
+	"main.h"
+
+1742913737 d:\c++\codeblocks\sdl game project\main.h
+
