@@ -1,6 +1,6 @@
 1. Ý tưởng:
-   - Phần đầu: game chạy, vượt chướng ngại vật tựa tựa dino game, cộng điểm khi vượt qua vật cản.
-   - Phần sau: game lái máy bay, bắn kẻ địch, tính điểm và thắng khi đủ điểm.
+   - Phần đầu (Running): game chạy, vượt chướng ngại vật tựa tựa dino game, cộng điểm khi vượt qua vật cản.
+   - Phần sau (Flying): game lái máy bay, bắn kẻ địch, tính điểm và thắng khi đủ điểm.
 
    - Ý tưởng phát triển:
    
@@ -31,5 +31,13 @@
                  + Xử lý lại kích thước width và height của lớp Player.
                  + Xử lý lại logic va chạm của cả 2 chế độ.
                  + Tạo thêm file main.h để quản lý chế độ chơi dễ hơn.
+   - 13/04/2025:
+     
+                 + Thêm thuộc tính máu vào lớp Player.
+                 + Thêm khả năng bắn cho Enemy.
+                 + Thêm và up ảnh vụ nổ của Enemy khi bị bắn trúng.
+                 + Thêm khả năng bắn từ 2 phía cho lớp Player.
+                 + Thêm quản lý đạn sao cho phù hợp về thời gian giữa các lần bắn.
+                 + Xử lý lại logic va chạm giữa đạn với player và enemy.
      
    
