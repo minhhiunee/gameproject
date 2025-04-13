@@ -11,19 +11,19 @@ Player::Player(int startX, int startY, SDL_Renderer* renderer) {
     x = startX;
     y = startY;
     initialY = startY;
-    width = 80;          // Kích thước cho RUNNING
+    width = 80;
     height = 150;
-    flyingWidth = 150;   // Kích thước cho FLYING
+    flyingWidth = 150;
     flyingHeight = 150;
-    speed = 7;
+    speed = 8;
     score = 0;
+    hp = 100; // Khởi tạo HP tối đa
     isJumping = false;
     jumpHeight = 0;
     currentFrame = 0;
     frameDelay = 5;
     frameCounter = 0;
 
-    // Tải 8 texture cho hoạt ảnh chạy
     for (int i = 1; i <= 8; i++) {
         string path = "playerun_" + to_string(i) + ".png";
         SDL_Texture* texture = IMG_LoadTexture(renderer, path.c_str());
@@ -33,7 +33,6 @@ Player::Player(int startX, int startY, SDL_Renderer* renderer) {
         runTextures.push_back(texture);
     }
 
-    // Tải texture cho chế độ FLYING
     textureFlying = IMG_LoadTexture(renderer, "playerfly_1.png");
     if (!textureFlying) {
         SDL_Log("Không thể tải textureFlying cho Player: %s", IMG_GetError());
@@ -62,7 +61,7 @@ void Player::movePlane(const Uint8* keystates) {
     if (keystates[SDL_SCANCODE_UP]) y -= speed;
     if (keystates[SDL_SCANCODE_DOWN]) y += speed;
     if (y < 0) y = 0;
-    if (y > WINDOW_HEIGHT - flyingHeight) y = WINDOW_HEIGHT - flyingHeight;  // Dùng flyingHeight
+    if (y > WINDOW_HEIGHT - flyingHeight) y = WINDOW_HEIGHT - flyingHeight;
 }
 
 void Player::updateAnimation() {
@@ -75,9 +74,9 @@ void Player::updateAnimation() {
 
 SDL_Rect Player::getRect(GameState state) {
     if (state == RUNNING) {
-        return {x, y, width, height};          // Kích thước cho RUNNING
+        return {x, y, width, height};
     }
-    return {x, y, flyingWidth, flyingHeight};  // Kích thước cho FLYING
+    return {x, y, flyingWidth, flyingHeight};
 }
 
 SDL_Texture* Player::getCurrentTexture(GameState state) {
@@ -85,4 +84,13 @@ SDL_Texture* Player::getCurrentTexture(GameState state) {
         return runTextures[currentFrame];
     }
     return textureFlying;
+}
+
+void Player::takeDamage(int damage) {
+    hp -= damage;
+    if (hp < 0) hp = 0;
+}
+
+bool Player::isAlive() const {
+    return hp > 0;
 }
