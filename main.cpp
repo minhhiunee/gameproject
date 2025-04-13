@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+
 #include "Player.h"
 #include "Enemy.h"
 #include "Bullet.h"
@@ -25,7 +26,7 @@ int main(int argc, char* argv[]) {
         SDL_Quit();
         return -1;
     }
-    SDL_Window* window = SDL_CreateWindow("Escape and Fly", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow("Escape from the planet", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window) {
         cerr << "Không thể tạo cửa sổ! SDL_Error: " << SDL_GetError() << endl;
         IMG_Quit();
@@ -90,12 +91,13 @@ int main(int argc, char* argv[]) {
     Enemy enemy(WINDOW_WIDTH, 100, renderer);
     vector<Bullet> bulletTops;
     vector<Bullet> bulletBottoms;
+    vector<Bullet> enemyBullets;
     GameState state = RUNNING;
 
     bool running = true;
     SDL_Event e;
     Uint32 lastShotTime = 0;
-    const Uint32 shootCooldown = 500;
+    const Uint32 shootCooldown = 750;
 
     while (running) {
         while (SDL_PollEvent(&e) != 0) {
@@ -113,7 +115,7 @@ int main(int argc, char* argv[]) {
                         topBullet.shoot(player.x + 50, player.y);
                         bottomBullet.shoot(player.x + 50, player.y + player.flyingHeight - BULLET_SIZE);
                         bulletTops.push_back(topBullet);
-                        bulletBottoms.push_back(bottomBullet); // Sửa thành bottomBullet
+                        bulletBottoms.push_back(bottomBullet);
                         lastShotTime = currentTime;
                     }
                 }
@@ -137,10 +139,10 @@ int main(int argc, char* argv[]) {
             if (object.isActive() && player.x + 50 > object.getX() &&
                 player.x < object.getX() + Object::getSize() &&
                 player.y + 50 > object.getY()) {
-                cout << "Trò chơi kết thúc! Điểm: " << player.score << endl;
+                cout << "End game !!! Score: " << player.score << endl;
                 running = false;
             }
-            if (player.score >= 2) {
+            if (player.score >= 20) {
                 state = FLYING;
                 player.y = WINDOW_HEIGHT / 2;
                 enemy.active = true;
@@ -149,6 +151,7 @@ int main(int argc, char* argv[]) {
         else if (state == FLYING) {
             player.movePlane(SDL_GetKeyboardState(NULL));
             enemy.update();
+            enemy.shoot(enemyBullets, renderer);
 
             for (size_t i = 0; i < bulletTops.size();) {
                 bulletTops[i].update();
@@ -168,13 +171,23 @@ int main(int argc, char* argv[]) {
                 }
             }
 
+            for (size_t i = 0; i < enemyBullets.size();) {
+                enemyBullets[i].update();
+                if (enemyBullets[i].getX() < -BULLET_SIZE) {
+                    enemyBullets.erase(enemyBullets.begin() + i);
+                } else {
+                    i++;
+                }
+            }
+
+            // Kiểm tra va chạm đạn Player với Enemy
             SDL_Rect enemyRect = enemy.getRect();
+            bool enemyHit = false;
             for (size_t i = 0; i < bulletTops.size();) {
                 SDL_Rect bulletRect = bulletTops[i].getRect();
                 if (SDL_HasIntersection(&bulletRect, &enemyRect)) {
-                    enemy.reset();
+                    enemyHit = true;
                     bulletTops.erase(bulletTops.begin() + i);
-                    player.score += 20;
                 } else {
                     i++;
                 }
@@ -182,16 +195,39 @@ int main(int argc, char* argv[]) {
             for (size_t i = 0; i < bulletBottoms.size();) {
                 SDL_Rect bulletRect = bulletBottoms[i].getRect();
                 if (SDL_HasIntersection(&bulletRect, &enemyRect)) {
-                    enemy.reset();
+                    enemyHit = true;
                     bulletBottoms.erase(bulletBottoms.begin() + i);
-                    player.score += 20;
+                } else {
+                    i++;
+                }
+            }
+            if (enemyHit) {
+                enemy.triggerExplosion(); //Gọi hàm
+                enemy.reset();
+                player.score += 10; // Cộng điểm
+            }
+
+            // Kiểm tra va chạm đạn Enemy với Player
+            SDL_Rect playerRect = player.getRect(state);
+            for (size_t i = 0; i < enemyBullets.size();) {
+                SDL_Rect bulletRect = enemyBullets[i].getRect();
+                if (SDL_HasIntersection(&bulletRect, &playerRect)) {
+                    player.takeDamage(10);
+                    enemyBullets.erase(enemyBullets.begin() + i);
+                    cout << "Player HP: " << player.hp << endl;
                 } else {
                     i++;
                 }
             }
 
-            SDL_Rect playerRect = player.getRect(state);
+            // Kiểm tra va chạm Player với Enemy
             if (SDL_HasIntersection(&playerRect, &enemyRect)) {
+                cout << "End game !!! Score: " << player.score << endl;
+                running = false;
+            }
+
+            // Kiểm tra nếu Player hết HP
+            if (!player.isAlive()) {
                 cout << "End game !!! Score: " << player.score << endl;
                 running = false;
             }
@@ -233,6 +269,14 @@ int main(int argc, char* argv[]) {
                     SDL_RenderCopy(renderer, bullet.getTexture(), NULL, &bulletRect);
                 }
             }
+
+            for (const Bullet& bullet : enemyBullets) {
+                if (bullet.isActive()) {
+                    SDL_Rect bulletRect = bullet.getRect();
+                    SDL_RenderCopy(renderer, bullet.getTexture(), NULL, &bulletRect);
+                }
+            }
+            enemy.renderExplosion(renderer);
         }
 
         SDL_RenderPresent(renderer);
