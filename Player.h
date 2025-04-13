@@ -10,12 +10,13 @@ class Player {
 public:
     int x, y;
     int initialY;
-    int width;           // Kích thước chung (dùng cho RUNNING)
+    int width;
     int height;
-    int flyingWidth;     // Kích thước riêng cho FLYING
+    int flyingWidth;
     int flyingHeight;
     int speed;
     int score;
+    int hp; // Thêm HP
     bool isJumping;
     double jumpHeight;
     vector<SDL_Texture*> runTextures;
@@ -29,8 +30,10 @@ public:
     void updateJump();
     void movePlane(const Uint8* keystates);
     void updateAnimation();
-    SDL_Rect getRect(GameState state); 
+    SDL_Rect getRect(GameState state);
     SDL_Texture* getCurrentTexture(GameState state);
+    void takeDamage(int damage); // Thêm hàm xử lý sát thương
+    bool isAlive() const; // Kiểm tra Player còn sống
 };
 
 #endif
