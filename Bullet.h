@@ -7,11 +7,12 @@ private:
     int x, y;
     bool active;
     SDL_Texture* texture;
+    bool isEnemyBullet; // Thêm để phân biệt đạn của Enemy
 
 public:
-    Bullet(SDL_Renderer* renderer);
-    Bullet(const Bullet& other); 
-    Bullet& operator=(const Bullet& other); 
+    Bullet(SDL_Renderer* renderer, bool isEnemy = false); // Thêm tham số isEnemy
+    Bullet(const Bullet& other);
+    Bullet& operator=(const Bullet& other);
     ~Bullet();
     void update();
     void shoot(int startX, int startY);
@@ -21,6 +22,7 @@ public:
     void deactivate() { active = false; }
     SDL_Texture* getTexture() const { return texture; }
     SDL_Rect getRect() const;
+    bool isEnemy() const { return isEnemyBullet; } // Kiểm tra loại đạn
 };
 
 #endif
