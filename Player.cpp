@@ -5,8 +5,6 @@
 #include "main.h"
 using namespace std;
 
-const int WINDOW_HEIGHT = 720;
-
 Player::Player(int startX, int startY, SDL_Renderer* renderer) {
     x = startX;
     y = startY;
@@ -15,9 +13,10 @@ Player::Player(int startX, int startY, SDL_Renderer* renderer) {
     height = 150;
     flyingWidth = 150;
     flyingHeight = 150;
-    speed = 8;
+    speed = 8; // Tốc độ cho FLYING
+    runningSpeed = 4; // Tốc độ ban đầu cho RUNNING
     score = 0;
-    hp = 100; // Khởi tạo HP tối đa
+    hp = 100;
     isJumping = false;
     jumpHeight = 0;
     currentFrame = 0;
@@ -49,7 +48,7 @@ Player::~Player() {
 void Player::updateJump() {
     if (isJumping) {
         y -= jumpHeight;
-        jumpHeight -= 0.5;
+        jumpHeight -= 0.6;
         if (y >= initialY) {
             y = initialY;
             isJumping = false;
@@ -57,16 +56,11 @@ void Player::updateJump() {
     }
 }
 
-void Player::movePlane(const Uint8* keystates) {
-    if (keystates[SDL_SCANCODE_UP]) y -= speed;
-    if (keystates[SDL_SCANCODE_DOWN]) y += speed;
-    if (y < 0) y = 0;
-    if (y > WINDOW_HEIGHT - flyingHeight) y = WINDOW_HEIGHT - flyingHeight;
-}
-
 void Player::updateAnimation() {
+    // Điều chỉnh frameDelay dựa trên runningSpeed để animation nhanh hơn
+    int adjustedFrameDelay = max(2, 6 - (runningSpeed - 4) / 2); // frameDelay giảm khi runningSpeed tăng
     frameCounter++;
-    if (frameCounter >= frameDelay) {
+    if (frameCounter >= adjustedFrameDelay) {
         frameCounter = 0;
         currentFrame = (currentFrame + 1) % 8;
     }
@@ -93,4 +87,22 @@ void Player::takeDamage(int damage) {
 
 bool Player::isAlive() const {
     return hp > 0;
+}
+
+void Player::setRunningSpeed(int newSpeed) {
+    runningSpeed = newSpeed;
+}
+
+void Player::reset(int startX, int startY) {
+    x = startX;
+    y = startY;
+    initialY = startY;
+    score = 0;
+    hp = 100;
+    isJumping = false;
+    jumpHeight = 0;
+    currentFrame = 0;
+    frameDelay = 5; // Đặt lại frameDelay
+    frameCounter = 0;
+    runningSpeed = 4; // Đặt lại runningSpeed
 }
