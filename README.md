@@ -39,5 +39,18 @@
                  + Thêm khả năng bắn từ 2 phía cho lớp Player.
                  + Thêm quản lý đạn sao cho phù hợp về thời gian giữa các lần bắn.
                  + Xử lý lại logic va chạm giữa đạn với player và enemy.
+   - 15/04/2025:
+   
+                 + Cài đặt SDL2_ttf.
+                 + Tạo giao diện UI gồm GameStart và GameOver.
+                 + Thêm nút Start và nút Restart.
+                 + Hiển thị điểm đạt được, thêm thanh máu cho nhân vật ở chế độ FLYING.
+   - 20/04/2025:
+   
+                 + Tăng độ khó cho game bằng cách tăng tốc độ chạy của nhân vật khi đạt mức điểm +=50.
+                 + Điều chỉnh lại hoạt ảnh chạy của nhân vật.
+                 + Điều chỉnh lại Object.
+              
+     
      
    
