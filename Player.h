@@ -14,9 +14,10 @@ public:
     int height;
     int flyingWidth;
     int flyingHeight;
-    int speed;
+    int speed; // Tốc độ di chuyển trong FLYING
+    int runningSpeed; // Tốc độ chạy trong RUNNING
     int score;
-    int hp; // Thêm HP
+    int hp;
     bool isJumping;
     double jumpHeight;
     vector<SDL_Texture*> runTextures;
@@ -28,12 +29,20 @@ public:
     Player(int startX, int startY, SDL_Renderer* renderer);
     ~Player();
     void updateJump();
-    void movePlane(const Uint8* keystates);
+    void movePlane(const Uint8* keystates) {
+        if (keystates[SDL_SCANCODE_UP]) this->y -= this->speed;
+        if (keystates[SDL_SCANCODE_DOWN]) this->y += this->speed;
+        if (this->y < 0) this->y = 0;
+        if (this->y > WINDOW_HEIGHT - flyingHeight) this->y = WINDOW_HEIGHT - flyingHeight;
+    }
     void updateAnimation();
     SDL_Rect getRect(GameState state);
     SDL_Texture* getCurrentTexture(GameState state);
-    void takeDamage(int damage); // Thêm hàm xử lý sát thương
-    bool isAlive() const; // Kiểm tra Player còn sống
+    void takeDamage(int damage);
+    bool isAlive() const;
+    void setRunningSpeed(int newSpeed);
+    int getRunningSpeed() const { return runningSpeed; }
+    void reset(int startX, int startY); // Hàm mới để đặt lại trạng thái
 };
 
 #endif
