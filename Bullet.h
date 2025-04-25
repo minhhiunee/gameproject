@@ -10,7 +10,7 @@ private:
     bool isEnemyBullet; // Thêm để phân biệt đạn của Enemy
 
 public:
-    Bullet(SDL_Renderer* renderer, bool isEnemy = false); // Thêm tham số isEnemy
+    Bullet(SDL_Renderer* renderer, bool isEnemy = false);
     Bullet(const Bullet& other);
     Bullet& operator=(const Bullet& other);
     ~Bullet();
