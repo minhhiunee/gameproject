@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <cstdlib>
 
 #include "Player.h"
 #include "Enemy.h"
@@ -17,6 +19,9 @@ using namespace std;
 const int BULLET_SIZE = 35;
 
 int main(int argc, char* argv[]) {
+    // Khởi tạo random seed
+    srand(SDL_GetTicks());
+
     // Khởi tạo SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         cerr << "SDL không thể khởi tạo! SDL_Error: " << SDL_GetError() << endl;
@@ -48,7 +53,7 @@ int main(int argc, char* argv[]) {
     // Tải nền cho RUNNING
     SDL_Surface* bgSurfaceRunning = IMG_Load("backgroundrunning.png");
     if (!bgSurfaceRunning) {
-        cerr << "Không thể tải background_running.png! IMG_Error: " << IMG_GetError() << endl;
+        cerr << "Không thể tải backgroundrunning.png! IMG_Error: " << IMG_GetError() << endl;
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         IMG_Quit();
@@ -61,7 +66,7 @@ int main(int argc, char* argv[]) {
     // Tải nền cho FLYING
     SDL_Surface* bgSurfaceFlying = IMG_Load("backgroundflying.png");
     if (!bgSurfaceFlying) {
-        cerr << "Không thể tải background_flying.png! IMG_Error: " << IMG_GetError() << endl;
+        cerr << "Không thể tải backgroundflying.png! IMG_Error: " << IMG_GetError() << endl;
         SDL_DestroyTexture(background1Running);
         SDL_DestroyTexture(background2Running);
         SDL_FreeSurface(bgSurfaceRunning);
@@ -94,6 +99,20 @@ int main(int argc, char* argv[]) {
     int bg2X = bgWidth;
     int bgSpeed = 3;
     int lastScoreMilestone = 0;
+    Uint32 lastEnemySpawnTime = 0;
+    Uint32 enemySpawnCooldown = 1000; // 1000ms ban đầu
+    Uint32 lastShotTime = 0;
+    const Uint32 defaultShootCooldown = 750; // Mặc định 750ms
+    const Uint32 fastShootCooldown = 500; // Tăng tốc bắn: 500ms
+    Uint32 shootCooldown = defaultShootCooldown;
+    int powerUpType = 0; // 0: không có, 1: tăng tốc bắn, 2: bất tử
+    Uint32 powerUpStartTime = 0;
+    const Uint32 powerUpDuration = 10000; // 10 giây
+    const Uint32 defaultEnemyShootCooldown = 1000; // Cooldown bắn enemy mặc định
+    Uint32 enemyShootCooldown = defaultEnemyShootCooldown; // Cooldown bắn enemy hiện tại
+    Uint32 lastEnemyShootTime = 0;
+    const float defaultPlayerSpeed = 8.0f; // Phù hợp với Player::speed
+    float playerSpeed = defaultPlayerSpeed; // Tốc độ người chơi hiện tại
 
     Player player(100, WINDOW_HEIGHT - 350, renderer);
     Object object(WINDOW_WIDTH, WINDOW_HEIGHT, renderer);
@@ -110,10 +129,10 @@ int main(int argc, char* argv[]) {
     // Vòng lặp game
     bool running = true;
     SDL_Event e;
-    Uint32 lastShotTime = 0;
-    const Uint32 shootCooldown = 750;
 
     while (running) {
+        Uint32 frameStart = SDL_GetTicks(); // Đo thời gian frame
+
         // Xử lý sự kiện
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) running = false;
@@ -124,7 +143,7 @@ int main(int argc, char* argv[]) {
                     if (state == START && ui.isStartButtonClicked(mouseX, mouseY)) {
                         state = RUNNING;
                     }
-                    else if (state == GAMEOVER && ui.isGameOverButtonClicked(mouseX, mouseY)) {
+                    else if ((state == GAMEOVER || state == VICTORY) && ui.isGameOverButtonClicked(mouseX, mouseY)) {
                         // Khởi động lại game
                         state = RUNNING;
                         player.reset(100, WINDOW_HEIGHT - 350);
@@ -139,6 +158,13 @@ int main(int argc, char* argv[]) {
                         bg2X = bgWidth;
                         bgSpeed = 3;
                         lastScoreMilestone = 0;
+                        lastEnemySpawnTime = 0;
+                        enemySpawnCooldown = 1000;
+                        shootCooldown = defaultShootCooldown;
+                        powerUpType = 0;
+                        powerUpStartTime = 0;
+                        enemyShootCooldown = defaultEnemyShootCooldown;
+                        playerSpeed = defaultPlayerSpeed;
                     }
                 }
             }
@@ -159,14 +185,45 @@ int main(int argc, char* argv[]) {
                         lastShotTime = currentTime;
                     }
                 }
+                else if ((state == GAMEOVER || state == VICTORY) && e.key.keysym.sym == SDLK_RETURN) {
+                    // Khởi động lại game khi nhấn Enter
+                    state = RUNNING;
+                    player.reset(100, WINDOW_HEIGHT - 350);
+                    object.reset(WINDOW_WIDTH);
+                    object.setSpeed(5);
+                    enemy.reset();
+                    enemy.active = false;
+                    bulletTops.clear();
+                    bulletBottoms.clear();
+                    enemyBullets.clear();
+                    bg1X = 0;
+                    bg2X = bgWidth;
+                    bgSpeed = 3;
+                    lastScoreMilestone = 0;
+                    lastEnemySpawnTime = 0;
+                    enemySpawnCooldown = 1000;
+                    shootCooldown = defaultShootCooldown;
+                    powerUpType = 0;
+                    powerUpStartTime = 0;
+                    enemyShootCooldown = defaultEnemyShootCooldown;
+                    playerSpeed = defaultPlayerSpeed;
+                }
             }
         }
 
         // Cập nhật logic game
-        if (state == START || state == GAMEOVER) {
-            // Không cập nhật trong trạng thái START hoặc GAMEOVER
+        if (state == START || state == GAMEOVER || state == VICTORY) {
+            // Không cập nhật trong trạng thái START, GAMEOVER hoặc VICTORY
         }
         else {
+            // Kiểm tra điều kiện Victory
+            if (player.score >= 1500) {
+                finalScore = player.score;
+                powerUpType = 0; // Thêm
+                powerUpStartTime = 0; // Thêm
+                state = VICTORY;
+            }
+
             // Cập nhật vị trí nền
             bg1X -= bgSpeed;
             bg2X -= bgSpeed;
@@ -178,18 +235,16 @@ int main(int argc, char* argv[]) {
                 object.update();
                 if (object.getX() < -Object::getSize()) {
                     object.reset(WINDOW_WIDTH);
-                    player.score += 30;
+                    player.score += 10;
                 }
 
                 // Kiểm tra mốc điểm 50 để tăng tốc độ
                 if (player.score >= lastScoreMilestone + 50) {
                     lastScoreMilestone += 50;
                     int newRunningSpeed = min(player.getRunningSpeed() + 1, 8);
-                    int newObjectSpeed = min(object.getSpeed() + 1, 6);
                     bgSpeed = min(bgSpeed + 1, 8);
                     player.setRunningSpeed(newRunningSpeed);
-                    object.setSpeed(newObjectSpeed);
-                    cout << "Score milestone: " << lastScoreMilestone << ", Running speed: " << newRunningSpeed << ", Object speed: " << newObjectSpeed << ", Background speed: " << bgSpeed << endl;
+                    object.setSpeed(object.getSpeed() + 1);
                 }
 
                 player.updateJump();
@@ -200,93 +255,137 @@ int main(int argc, char* argv[]) {
                     finalScore = player.score;
                     state = GAMEOVER;
                 }
-                if (player.score >= 150) {
+                if (player.score >= 300) {
                     state = FLYING;
                     player.x = 100;
                     player.y = WINDOW_HEIGHT / 2;
                     enemy.active = true;
+                    bgSpeed = 3;
                 }
             }
             else if (state == FLYING) {
                 lastGameMode = FLYING;
-                player.movePlane(SDL_GetKeyboardState(NULL));
+                player.movePlane(SDL_GetKeyboardState(NULL), playerSpeed); // Truyền playerSpeed
                 enemy.update();
-                enemy.shoot(enemyBullets, renderer);
+
+                // Bắn đạn enemy với cooldown
+                Uint32 currentTime = SDL_GetTicks();
+                if (currentTime - lastEnemyShootTime >= enemyShootCooldown && enemy.active) {
+                    enemy.shoot(enemyBullets, renderer);
+                    lastEnemyShootTime = currentTime;
+                }
+
+                // Kiểm tra thời gian bổ trợ
+                if (powerUpType != 0 && SDL_GetTicks() - powerUpStartTime > powerUpDuration) {
+                    if (powerUpType == 1) {
+                        shootCooldown = defaultShootCooldown;
+                        playerSpeed = defaultPlayerSpeed; // Reset tốc độ người chơi
+                    }
+                    powerUpType = 0;
+                    powerUpStartTime = 0;
+                }
 
                 // Cập nhật đạn người chơi (trên)
-                for (size_t i = 0; i < bulletTops.size();) {
+                for (int i = bulletTops.size() - 1; i >= 0; --i) {
                     bulletTops[i].update();
                     if (bulletTops[i].getX() > WINDOW_WIDTH) {
                         bulletTops.erase(bulletTops.begin() + i);
-                    } else {
-                        i++;
                     }
                 }
 
                 // Cập nhật đạn người chơi (dưới)
-                for (size_t i = 0; i < bulletBottoms.size();) {
-                    bulletBottoms[i].update(); // Sửa lỗi: dùng bulletBottoms thay vì bulletTops
+                for (int i = bulletBottoms.size() - 1; i >= 0; --i) {
+                    bulletBottoms[i].update();
                     if (bulletBottoms[i].getX() > WINDOW_WIDTH) {
                         bulletBottoms.erase(bulletBottoms.begin() + i);
-                    } else {
-                        i++;
                     }
                 }
 
                 // Cập nhật đạn của enemy
-                for (size_t i = 0; i < enemyBullets.size();) {
+                for (int i = enemyBullets.size() - 1; i >= 0; --i) {
                     enemyBullets[i].update();
                     if (enemyBullets[i].getX() < -BULLET_SIZE) {
                         enemyBullets.erase(enemyBullets.begin() + i);
-                    } else {
-                        i++;
                     }
                 }
 
                 // Kiểm tra va chạm giữa đạn người chơi và enemy
                 SDL_Rect enemyRect = enemy.getRect();
-                bool enemyHit = false;
-                for (size_t i = 0; i < bulletTops.size();) {
-                    SDL_Rect bulletRect = bulletTops[i].getRect();
-                    if (!enemyHit && SDL_HasIntersection(&bulletRect, &enemyRect)) { // Chỉ gọi triggerExplosion() một lần
-                        enemyHit = true;
-                        bulletTops.erase(bulletTops.begin() + i);
-                    } else {
-                        i++;
+                bool enemyKilledThisFrame = false;
+                for (int i = bulletTops.size() - 1; i >= 0; --i) {
+                    if (bulletTops[i].isActive()) {
+                        SDL_Rect bulletRect = bulletTops[i].getRect();
+                        if (SDL_HasIntersection(&bulletRect, &enemyRect) && enemy.active) {
+                            enemy.triggerExplosion();
+                            enemy.reset();
+                            bulletTops.erase(bulletTops.begin() + i);
+                            if (!enemyKilledThisFrame) {
+                                player.score += 10;
+                                enemyKilledThisFrame = true;
+                            }
+                        }
                     }
                 }
-                for (size_t i = 0; i < bulletBottoms.size();) {
-                    SDL_Rect bulletRect = bulletBottoms[i].getRect();
-                    if (!enemyHit && SDL_HasIntersection(&bulletRect, &enemyRect)) { // Chỉ gọi triggerExplosion() một lần
-                        enemyHit = true;
-                        bulletBottoms.erase(bulletBottoms.begin() + i);
-                    } else {
-                        i++;
+                for (int i = bulletBottoms.size() - 1; i >= 0; --i) {
+                    if (bulletBottoms[i].isActive()) {
+                        SDL_Rect bulletRect = bulletBottoms[i].getRect();
+                        if (SDL_HasIntersection(&bulletRect, &enemyRect) && enemy.active) {
+                            enemy.triggerExplosion();
+                            enemy.reset();
+                            bulletBottoms.erase(bulletBottoms.begin() + i);
+                            if (!enemyKilledThisFrame) {
+                                player.score += 10;
+                                enemyKilledThisFrame = true;
+                            }
+                        }
                     }
                 }
-                if (enemyHit) {
-                    enemy.triggerExplosion();
-                    enemy.reset();
-                    player.score += 10;
+
+                // Kiểm tra mốc điểm 50 để kích hoạt bổ trợ và giảm cooldown
+                if (player.score >= lastScoreMilestone + 50) {
+                    lastScoreMilestone += 50;
+                    enemySpawnCooldown = max<Uint32>(100, enemySpawnCooldown - 100); // Giảm 100ms, tối thiểu 100ms
+                    enemyShootCooldown = max<Uint32>(200, enemyShootCooldown - 50); // Giảm 50ms, tối thiểu 200ms
+
+                    // Kích hoạt bổ trợ ngẫu nhiên
+                    if (powerUpType == 0) { // Chỉ kích hoạt nếu không có bổ trợ
+                        powerUpType = (rand() % 2) + 1; // 1: tăng tốc bắn, 2: bất tử
+                        powerUpStartTime = SDL_GetTicks();
+                        if (powerUpType == 1) {
+                            shootCooldown = fastShootCooldown;
+                            playerSpeed = 10.0f; // Tăng tốc độ người chơi
+                        }
+                    }
                 }
 
                 // Kiểm tra va chạm giữa đạn enemy và người chơi
                 SDL_Rect playerRect = player.getRect(state);
-                for (size_t i = 0; i < enemyBullets.size();) {
-                    SDL_Rect bulletRect = enemyBullets[i].getRect();
-                    if (SDL_HasIntersection(&bulletRect, &playerRect)) {
-                        player.takeDamage(10);
-                        enemyBullets.erase(enemyBullets.begin() + i);
-                        cout << "Player HP: " << player.hp << endl;
-                    } else {
-                        i++;
+                if (powerUpType != 2) { // Chỉ nhận sát thương nếu không bất tử
+                    for (int i = enemyBullets.size() - 1; i >= 0; --i) {
+                        if (enemyBullets[i].isActive()) {
+                            SDL_Rect bulletRect = enemyBullets[i].getRect();
+                            if (SDL_HasIntersection(&bulletRect, &playerRect)) {
+                                player.takeDamage(10);
+                                enemyBullets.erase(enemyBullets.begin() + i);
+                            }
+                        }
                     }
                 }
 
                 // Kiểm tra va chạm trực tiếp giữa người chơi và enemy
-                if (SDL_HasIntersection(&playerRect, &enemyRect)) {
+                if (powerUpType != 2 && SDL_HasIntersection(&playerRect, &enemyRect)) {
                     finalScore = player.score;
                     state = GAMEOVER;
+                    powerUpType = 0;
+                    powerUpStartTime = 0;
+                }
+
+                // Kiểm tra enemy thoát màn hình
+                if (enemy.getRect().x <= -enemy.getRect().w) {
+                    finalScore = player.score;
+                    state = GAMEOVER;
+                    powerUpType = 0;
+                    powerUpStartTime = 0;
                 }
 
                 // Kiểm tra HP người chơi
@@ -297,7 +396,7 @@ int main(int argc, char* argv[]) {
             }
 
             // Cập nhật UI
-            ui.update(player.score, player.hp);
+            ui.update(player.score, player.hp, powerUpType, powerUpStartTime, powerUpDuration);
         }
 
         // Vẽ lên màn hình
@@ -306,11 +405,11 @@ int main(int argc, char* argv[]) {
         // Vẽ nền
         SDL_Rect bgRect1 = {bg1X, 0, bgWidth, WINDOW_HEIGHT};
         SDL_Rect bgRect2 = {bg2X, 0, bgWidth, WINDOW_HEIGHT};
-        if (state == START || state == RUNNING || (state == GAMEOVER && lastGameMode == RUNNING)) {
+        if (state == START || state == RUNNING || ((state == GAMEOVER || state == VICTORY) && lastGameMode == RUNNING)) {
             SDL_RenderCopy(renderer, background1Running, NULL, &bgRect1);
             SDL_RenderCopy(renderer, background2Running, NULL, &bgRect2);
         }
-        else if (state == FLYING || (state == GAMEOVER && lastGameMode == FLYING)) {
+        else if (state == FLYING || ((state == GAMEOVER || state == VICTORY) && lastGameMode == FLYING)) {
             SDL_RenderCopy(renderer, background1Flying, NULL, &bgRect1);
             SDL_RenderCopy(renderer, background2Flying, NULL, &bgRect2);
         }
@@ -353,10 +452,11 @@ int main(int argc, char* argv[]) {
         }
 
         // Vẽ UI
-        ui.render(state, finalScore);
-
+        ui.render(state, finalScore, powerUpType);
         SDL_RenderPresent(renderer);
-        SDL_Delay(16);
+
+        SDL_Delay(16); // Duy trì ~60 FPS
+
     }
 
     // Giải phóng tài nguyên
