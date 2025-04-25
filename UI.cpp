@@ -210,6 +210,16 @@ void UI::update(int score, int hp, int powerUpType, Uint32 powerUpStartTime, Uin
         powerUpRect.w = surface->w;
         powerUpRect.h = surface->h;
         SDL_FreeSurface(surface);
+    } else if (powerUpType == 3) {
+        SDL_Surface* surface = TTF_RenderText_Solid(font, "Health Regen", {255, 255, 255, 255});
+        if (!surface) {
+            SDL_Log("Failed to create power-up surface: %s", TTF_GetError());
+            return;
+        }
+        powerUpTexture = SDL_CreateTextureFromSurface(renderer, surface);
+        powerUpRect.w = surface->w;
+        powerUpRect.h = surface->h;
+        SDL_FreeSurface(surface);
     }
 }
 
