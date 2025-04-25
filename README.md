@@ -2,12 +2,6 @@
    - Phần đầu (Running): game chạy, vượt chướng ngại vật tựa tựa dino game, cộng điểm khi vượt qua vật cản.
    - Phần sau (Flying): game lái máy bay, bắn kẻ địch, tính điểm và thắng khi đủ điểm.
 
-   - Ý tưởng phát triển:
-   
-                         + Running: buff tăng tốc độ, bất tử, khiên.
-                         + Flying: buff tăng tốc độ, bất tử, khiên (nhận được bằng viện tiêu diệt kẻ thù). Tạo thêm boss để end game.
-   
-
 2. Quá trình làm game:
    - 12/03/2025:
    
