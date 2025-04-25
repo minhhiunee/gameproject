@@ -6,7 +6,8 @@ enum GameState {
     START,      // Trạng thái màn hình Start
     RUNNING,    // Trạng thái chạy
     FLYING,     // Trạng thái bay
-    GAMEOVER    // Trạng thái Game Over
+    GAMEOVER,   // Trạng thái Game Over
+    VICTORY     // Trạng thái Victory
 };
 
 #endif
