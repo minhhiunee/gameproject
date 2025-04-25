@@ -13,7 +13,7 @@ Player::Player(int startX, int startY, SDL_Renderer* renderer) {
     height = 150;
     flyingWidth = 150;
     flyingHeight = 150;
-    speed = 8; // Tốc độ cho FLYING
+    speed = 8; // Tốc độ mặc định (giữ cho tương thích)
     runningSpeed = 4; // Tốc độ ban đầu cho RUNNING
     score = 0;
     hp = 100;
@@ -56,9 +56,15 @@ void Player::updateJump() {
     }
 }
 
+void Player::movePlane(const Uint8* keystates, float speed) {
+    if (keystates[SDL_SCANCODE_LEFT] && x > 0) x -= static_cast<int>(speed);
+    if (keystates[SDL_SCANCODE_RIGHT] && x < WINDOW_WIDTH - flyingWidth) x += static_cast<int>(speed);
+    if (keystates[SDL_SCANCODE_UP] && y > 0) y -= static_cast<int>(speed);
+    if (keystates[SDL_SCANCODE_DOWN] && y < WINDOW_HEIGHT - flyingHeight) y += static_cast<int>(speed);
+}
+
 void Player::updateAnimation() {
-    // Điều chỉnh frameDelay dựa trên runningSpeed để animation nhanh hơn
-    int adjustedFrameDelay = max(2, 6 - (runningSpeed - 4) / 2); // frameDelay giảm khi runningSpeed tăng
+    int adjustedFrameDelay = max(2, 6 - (runningSpeed - 4) / 2);
     frameCounter++;
     if (frameCounter >= adjustedFrameDelay) {
         frameCounter = 0;
@@ -102,7 +108,7 @@ void Player::reset(int startX, int startY) {
     isJumping = false;
     jumpHeight = 0;
     currentFrame = 0;
-    frameDelay = 5; // Đặt lại frameDelay
+    frameDelay = 5;
     frameCounter = 0;
-    runningSpeed = 4; // Đặt lại runningSpeed
+    runningSpeed = 4;
 }
