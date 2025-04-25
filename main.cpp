@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
     const Uint32 defaultShootCooldown = 750; // Mặc định 750ms
     const Uint32 fastShootCooldown = 500; // Tăng tốc bắn: 500ms
     Uint32 shootCooldown = defaultShootCooldown;
-    int powerUpType = 0; // 0: không có, 1: tăng tốc bắn, 2: bất tử
+    int powerUpType = 0; // 0: không có, 1: tăng tốc bắn, 2: bất tử, 3: hồi máu
     Uint32 powerUpStartTime = 0;
     const Uint32 powerUpDuration = 10000; // 10 giây
     const Uint32 defaultEnemyShootCooldown = 1000; // Cooldown bắn enemy mặc định
@@ -113,6 +113,7 @@ int main(int argc, char* argv[]) {
     Uint32 lastEnemyShootTime = 0;
     const float defaultPlayerSpeed = 8.0f; // Phù hợp với Player::speed
     float playerSpeed = defaultPlayerSpeed; // Tốc độ người chơi hiện tại
+    Uint32 lastHealthRegenTime = 0; // Thời gian hồi máu gần nhất
 
     Player player(100, WINDOW_HEIGHT - 350, renderer);
     Object object(WINDOW_WIDTH, WINDOW_HEIGHT, renderer);
@@ -165,6 +166,7 @@ int main(int argc, char* argv[]) {
                         powerUpStartTime = 0;
                         enemyShootCooldown = defaultEnemyShootCooldown;
                         playerSpeed = defaultPlayerSpeed;
+                        lastHealthRegenTime = 0;
                     }
                 }
             }
@@ -207,6 +209,7 @@ int main(int argc, char* argv[]) {
                     powerUpStartTime = 0;
                     enemyShootCooldown = defaultEnemyShootCooldown;
                     playerSpeed = defaultPlayerSpeed;
+                    lastHealthRegenTime = 0;
                 }
             }
         }
@@ -217,10 +220,10 @@ int main(int argc, char* argv[]) {
         }
         else {
             // Kiểm tra điều kiện Victory
-            if (player.score >= 1500) {
+            if (player.score >= 1000) {
+                powerUpType = 0;
+                powerUpStartTime = 0;
                 finalScore = player.score;
-                powerUpType = 0; // Thêm
-                powerUpStartTime = 0; // Thêm
                 state = VICTORY;
             }
 
@@ -235,7 +238,7 @@ int main(int argc, char* argv[]) {
                 object.update();
                 if (object.getX() < -Object::getSize()) {
                     object.reset(WINDOW_WIDTH);
-                    player.score += 10;
+                    player.score += 30;
                 }
 
                 // Kiểm tra mốc điểm 50 để tăng tốc độ
@@ -253,9 +256,11 @@ int main(int argc, char* argv[]) {
                     player.x < object.getX() + Object::getSize() &&
                     player.y + 50 > object.getY()) {
                     finalScore = player.score;
+                    powerUpType = 0;
+                    powerUpStartTime = 0;
                     state = GAMEOVER;
                 }
-                if (player.score >= 300) {
+                if (player.score >= 10) {
                     state = FLYING;
                     player.x = 100;
                     player.y = WINDOW_HEIGHT / 2;
@@ -273,6 +278,12 @@ int main(int argc, char* argv[]) {
                 if (currentTime - lastEnemyShootTime >= enemyShootCooldown && enemy.active) {
                     enemy.shoot(enemyBullets, renderer);
                     lastEnemyShootTime = currentTime;
+                }
+
+                // Hồi máu nếu có bổ trợ hồi máu
+                if (powerUpType == 3 && currentTime - lastHealthRegenTime >= 1000) {
+                    player.hp = min(player.hp + 2, 100); // Hồi 2 HP, tối đa 100
+                    lastHealthRegenTime = currentTime;
                 }
 
                 // Kiểm tra thời gian bổ trợ
@@ -344,16 +355,16 @@ int main(int argc, char* argv[]) {
                 // Kiểm tra mốc điểm 50 để kích hoạt bổ trợ và giảm cooldown
                 if (player.score >= lastScoreMilestone + 50) {
                     lastScoreMilestone += 50;
-                    enemySpawnCooldown = max<Uint32>(100, enemySpawnCooldown - 100); // Giảm 100ms, tối thiểu 100ms
-                    enemyShootCooldown = max<Uint32>(200, enemyShootCooldown - 50); // Giảm 50ms, tối thiểu 200ms
+                    enemySpawnCooldown = max<Uint32>(50, enemySpawnCooldown - 100); // Giảm 100ms, tối thiểu 50ms
+                    enemyShootCooldown = max<Uint32>(50, enemyShootCooldown - 50); // Giảm 50ms, tối thiểu 50ms
 
                     // Kích hoạt bổ trợ ngẫu nhiên
                     if (powerUpType == 0) { // Chỉ kích hoạt nếu không có bổ trợ
-                        powerUpType = (rand() % 2) + 1; // 1: tăng tốc bắn, 2: bất tử
+                        powerUpType = (rand() % 3) + 1; // 1: tăng tốc bắn, 2: bất tử, 3: hồi máu
                         powerUpStartTime = SDL_GetTicks();
                         if (powerUpType == 1) {
                             shootCooldown = fastShootCooldown;
-                            playerSpeed = 10.0f; // Tăng tốc độ người chơi
+                            playerSpeed = 12.0f; // Tăng tốc độ người chơi
                         }
                     }
                 }
@@ -375,22 +386,24 @@ int main(int argc, char* argv[]) {
                 // Kiểm tra va chạm trực tiếp giữa người chơi và enemy
                 if (powerUpType != 2 && SDL_HasIntersection(&playerRect, &enemyRect)) {
                     finalScore = player.score;
-                    state = GAMEOVER;
                     powerUpType = 0;
                     powerUpStartTime = 0;
+                    state = GAMEOVER;
                 }
 
                 // Kiểm tra enemy thoát màn hình
                 if (enemy.getRect().x <= -enemy.getRect().w) {
                     finalScore = player.score;
-                    state = GAMEOVER;
                     powerUpType = 0;
                     powerUpStartTime = 0;
+                    state = GAMEOVER;
                 }
 
                 // Kiểm tra HP người chơi
                 if (!player.isAlive()) {
                     finalScore = player.score;
+                    powerUpType = 0;
+                    powerUpStartTime = 0;
                     state = GAMEOVER;
                 }
             }
