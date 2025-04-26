@@ -9,10 +9,10 @@
 ### [III. Cách chơi](#cachchoi)
 - [Điều khiển](#dieukhien)
 - [Chức năng chính](#chucnang)
-### [III. Nguồn tài nguyên tham khảo](#tainguyen)
+### [IV. Nguồn tài nguyên tham khảo](#tainguyen)
 - [Đồ họa](#dohoa)
 - [Source code](#code)
-
+### [V. Quá trình làm game](#quatrinh)
 <a name="ytuong"></a>
 ## I.Ý tưởng triển khai:
 <a name="nguonthamkhaogame"></a>
@@ -40,17 +40,18 @@
 ## IV: Nguồn tài nguyên tham khảo:
 <a name="dohoa"></a>
 1. Đồ họa:
-<a name="code"></a>
+
 	- Background:
-		+ https://www.shutterstock.com/vi/image-vector/pixel-art-forest-background-seamless-game-2501937379.
+		+ https://www.shutterstock.com/vi/image-vector/pixel-art-forest-background-seamless-game-2501937379. [backgroundrunning](backgroundrunning.png)
+
 		+ https://i.pinimg.com/1200x/37/21/1a/37211af2ca68131d5709c2ced13a4653.jpg.
 		+ https://www.pinterest.com/pin/47076758601767224/.
 	- Player (Running): https://craftpix.net/freebies/free-homeless-character-sprite-sheets-pixel-art/.
  	- Player (Flying - Enemy): https://i.pinimg.com/736x/58/d5/95/58d595e683468aebf229ebc1e88c205a.jpg.
  	- Bullet: https://www.spriters-resource.com/resources/sheets/25/27957.png.
- 	- 
+<a name="code"></a>
 2. Source code:
-
+<a name="quatrinh"></a>
 ## V. Quá trình làm game:
    - 12/03/2025:
 
