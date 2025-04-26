@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
     Uint32 enemySpawnCooldown = 1000; // 1000ms ban đầu
     Uint32 lastShotTime = 0;
     const Uint32 defaultShootCooldown = 750; // Mặc định 750ms
-    const Uint32 fastShootCooldown = 500; // Tăng tốc bắn: 500ms
+    const Uint32 fastShootCooldown = 375; // Tăng tốc bắn: 375ms
     Uint32 shootCooldown = defaultShootCooldown;
     int powerUpType = 0; // 0: không có, 1: tăng tốc bắn, 2: bất tử, 3: hồi máu
     Uint32 powerUpStartTime = 0;
@@ -171,7 +171,10 @@ int main(int argc, char* argv[]) {
                 }
             }
             if (e.type == SDL_KEYDOWN) {
-                if (state == RUNNING && e.key.keysym.sym == SDLK_SPACE && !player.isJumping) {
+                if (state == START && e.key.keysym.sym == SDLK_s) {
+                state = RUNNING;
+                }
+                else if (state == RUNNING && e.key.keysym.sym == SDLK_SPACE && !player.isJumping) {
                     player.isJumping = true;
                     player.jumpHeight = 15;
                 }
@@ -238,7 +241,7 @@ int main(int argc, char* argv[]) {
                 object.update();
                 if (object.getX() < -Object::getSize()) {
                     object.reset(WINDOW_WIDTH);
-                    player.score += 30;
+                    player.score += 10;
                 }
 
                 // Kiểm tra mốc điểm 50 để tăng tốc độ
@@ -260,7 +263,7 @@ int main(int argc, char* argv[]) {
                     powerUpStartTime = 0;
                     state = GAMEOVER;
                 }
-                if (player.score >= 10) {
+                if (player.score >= 250) {
                     state = FLYING;
                     player.x = 100;
                     player.y = WINDOW_HEIGHT / 2;
@@ -327,7 +330,7 @@ int main(int argc, char* argv[]) {
                     if (bulletTops[i].isActive()) {
                         SDL_Rect bulletRect = bulletTops[i].getRect();
                         if (SDL_HasIntersection(&bulletRect, &enemyRect) && enemy.active) {
-                            enemy.triggerExplosion();
+                            //enemy.triggerExplosion();
                             enemy.reset();
                             bulletTops.erase(bulletTops.begin() + i);
                             if (!enemyKilledThisFrame) {
@@ -341,7 +344,7 @@ int main(int argc, char* argv[]) {
                     if (bulletBottoms[i].isActive()) {
                         SDL_Rect bulletRect = bulletBottoms[i].getRect();
                         if (SDL_HasIntersection(&bulletRect, &enemyRect) && enemy.active) {
-                            enemy.triggerExplosion();
+                            //enemy.triggerExplosion();
                             enemy.reset();
                             bulletBottoms.erase(bulletBottoms.begin() + i);
                             if (!enemyKilledThisFrame) {
