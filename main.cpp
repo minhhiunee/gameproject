@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
     const Uint32 defaultEnemyShootCooldown = 1000; // Cooldown bắn enemy mặc định
     Uint32 enemyShootCooldown = defaultEnemyShootCooldown; // Cooldown bắn enemy hiện tại
     Uint32 lastEnemyShootTime = 0;
-    const float defaultPlayerSpeed = 8.0f; // Phù hợp với Player::speed
+    const float defaultPlayerSpeed = 8.0f; 
     float playerSpeed = defaultPlayerSpeed; // Tốc độ người chơi hiện tại
     Uint32 lastHealthRegenTime = 0; // Thời gian hồi máu gần nhất
 
@@ -330,7 +330,7 @@ int main(int argc, char* argv[]) {
                     if (bulletTops[i].isActive()) {
                         SDL_Rect bulletRect = bulletTops[i].getRect();
                         if (SDL_HasIntersection(&bulletRect, &enemyRect) && enemy.active) {
-                            //enemy.triggerExplosion();
+                            enemy.triggerExplosion();
                             enemy.reset();
                             bulletTops.erase(bulletTops.begin() + i);
                             if (!enemyKilledThisFrame) {
@@ -344,7 +344,7 @@ int main(int argc, char* argv[]) {
                     if (bulletBottoms[i].isActive()) {
                         SDL_Rect bulletRect = bulletBottoms[i].getRect();
                         if (SDL_HasIntersection(&bulletRect, &enemyRect) && enemy.active) {
-                            //enemy.triggerExplosion();
+                            enemy.triggerExplosion();
                             enemy.reset();
                             bulletBottoms.erase(bulletBottoms.begin() + i);
                             if (!enemyKilledThisFrame) {
