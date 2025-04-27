@@ -32,7 +32,7 @@ void Object::update() {
 }
 
 void Object::reset(int windowWidth) {
-    x = windowWidth + (rand() % 200 ); // Thêm khoảng cách ngẫu nhiên 100-300
+    x = windowWidth + (rand() % 200 ); // Thêm khoảng cách ngẫu nhiên
     currentTexture = textures[rand() % 5];
 }
 
