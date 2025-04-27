@@ -1,4 +1,7 @@
-# Game project description
+# Game project description:
+
+## Video giới thiệu, chơi demo và giải thích các logic - thành phần của mã nguồn game: [Video tại đây.](https://drive.google.com/file/d/1Xa3WOWRzSIspU3g_cIG-J0yKHkOr47Ou/view?usp=sharing)
+
 ## Mục lục
 
 ### [I. Ý tưởng triển khai](#ytuong)
@@ -36,19 +39,16 @@
 + Mở Code::Block, mở Game project thông qua file `DemoSDL.cbp`.
   ![codeblock](https://github.com/user-attachments/assets/54171a41-71a9-41f9-99f2-49cc252db169)
   ![open](https://github.com/user-attachments/assets/df17e11d-db45-4f2f-8da4-ebcd066b4e9d)
-  
-
-
-
 + Tiến hành Build and run code và chơi.![buildandrun](https://github.com/user-attachments/assets/ba79a5b1-ddbd-4786-8749-0c787089552c)
-
-
++ 
 <a name="cachchoi"></a>
 ## III. Cách chơi:
+
 <a name="dieukhien"></a>
 1. `Điều khiển`:
    - Chế độ RUNNING: ấn `SPACE` để nhảy.
    - Chế độ FLYING: `Key ⬆️, ⬇️, ⬅️, ➡️` di chuyển lên, xuống, trái, phải.
+   - 
 <a name="chucnang"></a>
 2. `Chức năng chính`:
    - Space: `nhảy` (RUNNING) và `bắn` (FLYING).
@@ -58,7 +58,7 @@
    - Tại màn hình START, click chuột trái vào `nút Start` hoặc ấn phím `S` để bắt đầu.![batdaugame](https://github.com/user-attachments/assets/8a2d2a86-e003-4fae-a40e-02a256e809e6)
    - Nhấn `Space` để nhảy qua vật cản tại vị trí thích hợp.![nhảy](https://github.com/user-attachments/assets/fe685aa7-8734-4089-a657-e00290c5d140)
    - Với mỗi mốc +=50 điểm đạt được thì tốc độ di chuyển của cả game sẽ nhanh hơn ban đầu.
-   - Khi đạt mốc điểm `250` thì sẽ chuyển sang chế độ FLYING (game bắn máy bay). Máy bay của kẻ thù sẽ xuất hiện ngẫu nhiên bên phải màn hình, việc của bạn là ấn `Space` để bắn ra đạn tiêu diệt kẻ thù.![image](https://github.com/user-attachments/assets/7269fc3e-1b57-4463-85da-27ea31952de6)
+   - Khi đạt mốc điểm `500` thì sẽ chuyển sang chế độ FLYING (game bắn máy bay). Máy bay của kẻ thù sẽ xuất hiện ngẫu nhiên bên phải màn hình, việc của bạn là ấn `Space` để bắn ra đạn tiêu diệt kẻ thù.![image](https://github.com/user-attachments/assets/7269fc3e-1b57-4463-85da-27ea31952de6)
    - Mặc định bạn sẽ có 100 Hp, mỗi khi trúng đạn của địch sẽ bị -10 Hp.
      
    - Tính năng cải thiện game: với mỗi mốc điểm += 50 điểm đạt được, bạn sẽ nhận được ngẫu nhiên 1 trong 3 bổ trợ là: tăng tốc độ, bất tử và hồi máu ( hiệu ứng kéo dài trong 10 giây ).
@@ -66,13 +66,12 @@
      - Bạn bị kẻ địch bắn về 0 Hp --> Game Over.
      - Bạn va chạm trực tiếp với máy bay kẻ định khi không bất tử --> Game Over.
      - Bạn để máy bay địch bay chạm đến phía bên trái màn hình game --> Game Over.
-     - Bạn tiêu diệt địch và tích điểm = 1000 điểm --> Victory !!!
+     - Bạn tiêu diệt địch và tích điểm = 1500 điểm --> Victory !!!
    - Tại màn hình Game Over hoặc Victory, bạn có thể click chuột trái nào nút `Restart` hoặc ấn phím `Enter` để chơi lại.![image](https://github.com/user-attachments/assets/40185423-0928-4c7e-81e0-ba555e567f97)
-
- 
 
 <a name="tainguyen"></a>
 ## IV: Nguồn tài nguyên tham khảo:
+
 <a name="dohoa"></a>
 1. `Đồ họa`:
 
@@ -84,7 +83,7 @@
 			+ [Skulls and bones: ](https://i.pinimg.com/1200x/37/21/1a/37211af2ca68131d5709c2ced13a4653.jpg)
    			+ Mây: google.com.vn.
 	- [Player (Running)](https://craftpix.net/freebies/free-homeless-character-sprite-sheets-pixel-art/)![playerimage](playerun_2.png)
- 	- [Player (Flying - Enemy):  ](https://i.pinimg.com/736x/58/d5/95/58d595e683468aebf229ebc1e88c205a.jpg)![playerimage](playerfly_1.png)![enemyimg](enemy_1.png)![enemyimg](enemy_2.png)![enemyimg](enemy_3.png)
+ 	- [Player - Enemy (Flying):  ](https://i.pinimg.com/736x/58/d5/95/58d595e683468aebf229ebc1e88c205a.jpg)![playerimage](playerfly_1.png)![enemyimg](enemy_1.png)![enemyimg](enemy_2.png)![enemyimg](enemy_3.png)
  	- [Bullet: ](https://www.spriters-resource.com/resources/sheets/25/27957.png)![bullet](bullet_player.png)
 <a name="code"></a>
 2. `Source code`:
@@ -95,6 +94,8 @@
    + [youtube.com](https://www.youtube.com/)
    + [google.com](https://www.google.com/)
    + [stackoverflow.com](https://stackoverflow.com/questions)
+   + chatgpt.com
+   + grok.com
    + (các nguồn nhỏ lẻ khác...)
 
 <a name="git"></a>
@@ -139,8 +140,12 @@
      + `Các file khác`:
        + arial.ttf
        + ...
+     + `Logic chính của game: ` kiểm tra sự va chạm giữa các đối tượng trong game:
+       + Running: Axis-Aligned Bounding Box (AABB)
+       + Flying: SDL_Rect + SDL_HasIntersection.
 
-       
+
+
         
        
 
@@ -201,7 +206,7 @@
                  + Cập nhật lớp Player.
                  + Cập nhật lớp Object ( giảm thời gian spawn vật cản sau mỗi mốc 50 điểm ).
                  + ....
-                 
+   - 26/04/2025: `Update lần cuối, chính thức hoàn thiện game.` Tự đánh giá: game còn hơi đơn giản, còn nhiều chỗ chưa hợp lý, không có âm thanh...
      
      
    
