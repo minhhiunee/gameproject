@@ -13,7 +13,7 @@ Player::Player(int startX, int startY, SDL_Renderer* renderer) {
     height = 150;
     flyingWidth = 150;
     flyingHeight = 150;
-    speed = 8; // Tốc độ mặc định
+    speed = 8; // Tốc độ mặc định trong FLYING
     runningSpeed = 4; // Tốc độ ban đầu cho RUNNING
     score = 0;
     hp = 100;
