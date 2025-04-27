@@ -33,7 +33,7 @@ private:
     SDL_Rect gameOverButtonRect; // Vị trí nút Restart
     SDL_Rect gameOverButtonTextRect; // Vị trí văn bản trên nút Restart
     SDL_Rect powerUpRect;        // Vị trí text bổ trợ
-    int powerUpType;             // 0: không có, 1: tăng tốc bắn, 2: bất tử
+    int powerUpType;             // 0: không có, 1: tăng tốc bắn, 2: bất tử, 3: Hồi máu
     Uint32 powerUpStartTime;     // Thời gian bắt đầu bổ trợ
     Uint32 powerUpDuration;      // Thời gian hiệu lực
 
