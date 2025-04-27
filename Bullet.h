@@ -7,7 +7,7 @@ private:
     int x, y;
     bool active;
     SDL_Texture* texture;
-    bool isEnemyBullet; // Thêm để phân biệt đạn của Enemy
+    bool isEnemyBullet; // phân biệt đạn của Enemy
 
 public:
     Bullet(SDL_Renderer* renderer, bool isEnemy = false);
