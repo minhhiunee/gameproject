@@ -3,7 +3,6 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <stdio.h>
-#include <string>
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
@@ -108,10 +107,10 @@ int main(int argc, char* argv[]) {
     int powerUpType = 0; // 0: không có, 1: tăng tốc bắn, 2: bất tử, 3: hồi máu
     Uint32 powerUpStartTime = 0;
     const Uint32 powerUpDuration = 10000; // 10 giây
-    const Uint32 defaultEnemyShootCooldown = 1000; // Cooldown bắn enemy mặc định
+    const Uint32 defaultEnemyShootCooldown = 750; // Cooldown bắn enemy mặc định
     Uint32 enemyShootCooldown = defaultEnemyShootCooldown; // Cooldown bắn enemy hiện tại
     Uint32 lastEnemyShootTime = 0;
-    const float defaultPlayerSpeed = 8.0f; 
+    const float defaultPlayerSpeed = 8.0f;
     float playerSpeed = defaultPlayerSpeed; // Tốc độ người chơi hiện tại
     Uint32 lastHealthRegenTime = 0; // Thời gian hồi máu gần nhất
 
@@ -160,7 +159,7 @@ int main(int argc, char* argv[]) {
                         bgSpeed = 3;
                         lastScoreMilestone = 0;
                         lastEnemySpawnTime = 0;
-                        enemySpawnCooldown = 1000;
+                        enemySpawnCooldown = 750;
                         shootCooldown = defaultShootCooldown;
                         powerUpType = 0;
                         powerUpStartTime = 0;
@@ -223,7 +222,7 @@ int main(int argc, char* argv[]) {
         }
         else {
             // Kiểm tra điều kiện Victory
-            if (player.score >= 1000) {
+            if (player.score >= 1500) {
                 powerUpType = 0;
                 powerUpStartTime = 0;
                 finalScore = player.score;
@@ -263,7 +262,7 @@ int main(int argc, char* argv[]) {
                     powerUpStartTime = 0;
                     state = GAMEOVER;
                 }
-                if (player.score >= 250) {
+                if (player.score >= 30) {
                     state = FLYING;
                     player.x = 100;
                     player.y = WINDOW_HEIGHT / 2;
