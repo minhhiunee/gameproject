@@ -10,11 +10,11 @@ class Player {
 public:
     int x, y;
     int initialY;
-    int width;
-    int height;
+    int width; //Chiều rộng
+    int height; //Chiều dài
     int flyingWidth;
     int flyingHeight;
-    int speed; // Tốc độ mặc định trong FLYING 
+    int speed; // Tốc độ mặc định trong FLYING
     int runningSpeed; // Tốc độ chạy trong RUNNING
     int score;
     int hp;
@@ -29,7 +29,7 @@ public:
     Player(int startX, int startY, SDL_Renderer* renderer);
     ~Player();
     void updateJump();
-    void movePlane(const Uint8* keystates, float speed); // Thêm tham số speed
+    void movePlane(const Uint8* keystates, float speed);
     void updateAnimation();
     SDL_Rect getRect(GameState state);
     SDL_Texture* getCurrentTexture(GameState state);
