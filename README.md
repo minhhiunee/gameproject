@@ -76,7 +76,7 @@
 1. `Đồ họa`:
 
 	- Background:
-		+ [Background Running]([(https://www.shutterstock.com/vi/image-vector/pixel-art-forest-background-seamless-game-2501937379): ![backgroundrunning](backgroundrunning.png)
+		+ [Background Running](https://www.shutterstock.com/vi/image-vector/pixel-art-forest-background-seamless-game-2501937379): ![backgroundrunning](backgroundrunning.png)
 
 		+ [Background Flying](https://www.pinterest.com/pin/47076758601767224/): ![backgroundflying](backgroundflying.png)
 		+ Trang trí thêm:
